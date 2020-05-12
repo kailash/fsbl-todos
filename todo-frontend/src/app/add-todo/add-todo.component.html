@@ -1,0 +1,30 @@
+<mat-card class="todo-card">
+    <mat-card-header>
+        <div mat-card-avatar class="example-header-image">
+            <i class="material-icons">post_add</i>
+        </div>
+        <mat-card-title>Add Todo</mat-card-title>
+        <mat-card-subtitle>Add todo items or things to learn</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+        <form #todoForm="ngForm" (ngSubmit)="createTodo(todoForm)" novalidate>
+            <mat-form-field class="form">
+                <mat-label>Todo</mat-label>
+                <textarea matInput placeholder="Ex. prepare MoM..." class="todo-text" required name="title" [(ngModel)]="newTodo.title" cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="2" cdkAutosizeMaxRows="5"></textarea>
+            </mat-form-field>
+
+
+            <section class="options-section">
+                <mat-checkbox class="options-margin" name="isPersonal" [(ngModel)]="newTodo.isPersonal" color="primary">Personal</mat-checkbox>
+                <mat-checkbox class="options-margin" name="isWork" [(ngModel)]="newTodo.isWork" color="primary">Work</mat-checkbox>
+                <mat-checkbox class="options-margin" name="isFuture" [(ngModel)]="newTodo.isFuture" color="primary">Future</mat-checkbox>
+                <mat-checkbox class="options-margin" name="isLearning" [(ngModel)]="newTodo.isLearning" color="primary">Learning (fsbl)</mat-checkbox>
+            </section>
+            <button mat-raised-button class="button" color="primary" onclick="">Add</button>
+        </form>
+    </mat-card-content>
+    <mat-card-actions>
+
+    </mat-card-actions>
+
+</mat-card>

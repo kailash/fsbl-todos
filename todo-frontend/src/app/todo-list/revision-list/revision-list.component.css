@@ -1,0 +1,8 @@
+.todo-content {
+    width: 40vw;
+    margin: 0px 0px 0px 7px;
+}
+
+.mat-chip.mat-standard-chip {
+    border-radius: 50px !important;
+}

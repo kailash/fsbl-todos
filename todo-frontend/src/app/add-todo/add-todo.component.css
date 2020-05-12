@@ -1,0 +1,36 @@
+.todo-card {
+    width: 80vw;
+    margin: 2px;
+}
+
+.todo-create {
+    margin: 0 auto;
+}
+
+.form {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: left;
+    flex-direction: column;
+}
+
+.todo-text {
+    width: 100%;
+}
+
+.options-section {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    height: 60px;
+}
+
+.options-margin {
+    margin: 0px 10px 0px 0px;
+}
+
+.material-icons {
+    transform: scale(2);
+    margin: 12px 0px 0px 12px;
+}

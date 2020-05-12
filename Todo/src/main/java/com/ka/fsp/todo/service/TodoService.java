@@ -32,7 +32,7 @@ public class TodoService {
 	
 	
 	public List<TodoEntity> getRivision4Date(LocalDate date){
-		return todoRepository.findByNextRevisionDateAndCompletedTrue(date.plusDays(1));
+		return todoRepository.findByNextRevisionDateAndCompletedTrue(date);
 	}
 	
 	public TodoEntity save(Todo todo) {
@@ -40,6 +40,10 @@ public class TodoService {
 		todoEntity.setId(todo.getId());
 		todoEntity.setTitle(todo.getTitle());
 		todoEntity.setRevisionIeration(0);
+		todoEntity.setFuture(todo.isFuture());
+		todoEntity.setLearning(todo.isLearning());
+		todoEntity.setWork(todo.isWork());
+		todoEntity.setPersonal(todo.isPersonal());
 		//todoEntity.setNextRevision(todo.getCreatedAt().plusDays(1));
 		todoEntity.setCompleted(false);
 		

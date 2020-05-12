@@ -53,6 +53,13 @@ export class RevisionListComponent implements OnInit {
     Object.assign(this.editingTodo, todoData);
   }
 
+  deleteTodo(id: string): void {
+    this.todoService.deleteTodo(id)
+    .then(() => {
+      this.todos = this.todos.filter(todo => todo.id != id);
+    });
+  }
+
   clearEditing(): void {
     this.editingTodo = new Todo();
     this.editing = false;

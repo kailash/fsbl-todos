@@ -47,7 +47,7 @@ export class TodoServiceService {
   }
 
   updateTodoAndAdd2NextIteration(todoData: Todo): Promise<Todo>{
-    return this.http.put(this.baseUrl + '/api/todos/updateitr' + todoData.id, todoData)
+    return this.http.put(this.baseUrl + '/api/todos/updateitr/' + todoData.id, todoData)
       .toPromise()
       .then(response => response.json() as Todo)
       .catch(this.handleError);

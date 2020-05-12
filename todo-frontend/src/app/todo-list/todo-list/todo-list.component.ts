@@ -60,7 +60,7 @@ export class TodoListComponent implements OnInit {
 
   toggleCompleted(todoData: Todo): void {
     todoData.completed = !todoData.completed;
-    this.todoService.updateTodo(todoData)
+    this.todoService.updateTodoAndAdd2NextIteration(todoData)
     .then(updatedTodo => {
       let existingTodo = this.todos.find(todo => todo.id === updatedTodo.id);
       Object.assign(existingTodo, updatedTodo);

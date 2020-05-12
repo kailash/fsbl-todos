@@ -1,0 +1,21 @@
+.container {
+    display: flex;
+    flex-direction: column;
+}
+
+.add-todo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.display-todo {
+    margin-top: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: left;
+}
+
+.footer {
+    margin-top: 20px;
+}

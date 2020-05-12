@@ -1,15 +1,16 @@
 <div class="todo-content">
-    <h1 class="page-title">Revision Task ({{ dateToday | date }})</h1>
-    <div class="todo-create">
-        <!-- <form #todoForm="ngForm" (ngSubmit)="createTodo(todoForm)" novalidate>
+    <h2 class="page-title">Rework ({{ dateToday | date }})</h2>
+    <!--<div class="todo-create">
+        <form #todoForm="ngForm" (ngSubmit)="createTodo(todoForm)" novalidate>
             <input type="text" id="title" class="form-control" placeholder="Type a todo and press enter..." required name="title" [(ngModel)]="newTodo.title" #title="ngModel">
             <div *ngIf="title.errors && title.dirty" class="alert alert-danger">
                 <div [hidden]="!title.errors.required">
                     Title is required.
                 </div>
             </div>
-        </form> -->
-    </div>
+        </form> 
+    </div>-->
+    <mat-divider></mat-divider>
     <ul class="todo-list">
         <li *ngFor="let todo of todos">
             <div class="todo-row" *ngIf="!editing || editingTodo.id != todo.id">
@@ -26,6 +27,14 @@
                 <a (click)="deleteTodo(todo.id)">
                   <i class="material-icons delete">clear</i>
                 </a>
+            </span>
+                <span class="chips">
+                <mat-chip-list>
+                    <mat-chip *ngIf="todo.isWork" color="warn" selected>work</mat-chip>
+                    <mat-chip *ngIf="todo.isPersonal" color="primary" selected>personal</mat-chip>
+                    <mat-chip *ngIf="todo.isFuture" color="primary" selected>future</mat-chip>
+                    <mat-chip *ngIf="todo.isLearning" color="primary" selected>learning</mat-chip>
+                </mat-chip-list>
             </span>
             </div>
             <div class="todo-edit" *ngIf="editing && editingTodo.id === todo.id">
