@@ -1,27 +1,33 @@
-# TodoFrontend
+# FSBL Todo — Frontend
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.3.17.
+React 18 + Vite 5 + TypeScript frontend for the Fibonacci Spaced-Based Learning todo app.
 
-## Development server
+## Stack
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+- **Vite 5** — build tool & dev server
+- **React 18** — UI framework
+- **TypeScript 5** — type safety
+- **Tailwind CSS 3** — utility-first styling
+- **shadcn/ui** (Radix UI primitives) — accessible components
+- **Lucide React** — icons
 
-## Code scaffolding
+## Development
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+```bash
+npm install
+npm run dev        # dev server at http://localhost:5173
+npm run build      # type-check + production build → dist/
+npm run preview    # preview production build locally
+```
 
-## Build
+Requires the backend running at `http://localhost:8080`. See the root `docker-compose.yml` to run everything together.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+## Docker
 
-## Running unit tests
+The full stack (frontend + backend + MongoDB) is managed from the repo root:
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+```bash
+docker compose up --build
+```
 
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+Frontend is served via Nginx on port 4200.

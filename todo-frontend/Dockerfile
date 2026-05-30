@@ -1,6 +1,10 @@
-FROM node:10.16.3
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
-COPY dist /usr/src/app/dist
-RUN npm install http-server -g
-CMD ["http-server","dist/GipherUI"]
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+EXPOSE 80
