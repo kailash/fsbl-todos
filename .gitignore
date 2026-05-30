@@ -1,69 +1,56 @@
+# ── Build outputs ────────────────────────────────────────────────
+backend/target/
+frontend/dist/
+frontend/.vite/
 
-# compiled output
-/dist
-/tmp
-/out-tsc
+# ── Dependencies ─────────────────────────────────────────────────
+frontend/node_modules/
 
-# dependencies
-/node_modules
+# ── Environment files ─────────────────────────────────────────────
+# .env is committed (safe defaults); local overrides are not
+frontend/.env.local
+frontend/.env.*.local
 
-# IDEs and editors
-/.idea
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
+# ── Logs ─────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+testem.log
 
-# IDE - VSCode
+# ── Claude Code internals ─────────────────────────────────────────
+.claude/worktrees/
+.claude/plans/
+
+# ── Maven wrapper ─────────────────────────────────────────────────
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/MavenWrapperDownloader.java
+
+# ── IDEs ─────────────────────────────────────────────────────────
+.idea/
+*.iws
+*.iml
+*.ipr
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+.project
+.classpath
+.factorypath
+.settings/
+.springBeans
+.sts4-cache
+.apt_generated
+*.sublime-workspace
+*.launch
+.c9/
 
-# misc
-/.sass-cache
-/connect.lock
-/coverage
-/libpeerconnection.log
-npm-debug.log
-yarn-error.log
-testem.log
-/typings
-
-# System Files
+# ── OS ───────────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
 
-/target/
-/mongo-data/
-!.mvn/wrapper/maven-wrapper.jar
-
-/target/
-!.mvn/wrapper/maven-wrapper.jar
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-/build/
-
+# ── Misc ─────────────────────────────────────────────────────────
+coverage/
+out-tsc/

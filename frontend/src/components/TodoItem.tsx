@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Pencil, Trash2, Check, X, CheckCircle2, Circle, RotateCcw, Clock } from 'lucide-react'
 import { CategoryBadges } from './CategoryBadge'
 import { formatRevisionDate } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import type { Todo } from '@/types/todo'
 
 interface Props {
@@ -70,17 +71,17 @@ export function TodoItem({ todo, variant, onToggle, onUpdate, onDelete }: Props)
       {/* Toggle button */}
       <button
         onClick={() => onToggle(todo)}
-        aria-label={variant === 'revision' ? 'Mark as reviewed' : 'Mark complete'}
+        aria-label={variant === 'revision' ? 'Mark as reviewed — schedules next spaced review' : 'Mark complete'}
         aria-pressed={todo.completed}
-        title={variant === 'revision' ? 'Mark reviewed' : 'Mark complete'}
-        className={[
+        title={variant === 'revision' ? 'Mark as reviewed — schedules next spaced review' : 'Mark complete'}
+        className={cn(
           'flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-colors mt-0.5',
           variant === 'revision'
             ? 'text-slate-300 hover:text-teal-500 hover:bg-teal-50'
             : todo.completed
               ? 'text-emerald-500'
-              : 'text-slate-300 hover:text-indigo-500 hover:bg-indigo-50',
-        ].join(' ')}
+              : 'text-slate-300 hover:text-indigo-500 hover:bg-indigo-50'
+        )}
       >
         {variant === 'revision'
           ? <RotateCcw size={16} />
@@ -97,12 +98,7 @@ export function TodoItem({ todo, variant, onToggle, onUpdate, onDelete }: Props)
           {todo.title}
         </span>
         <div className="flex items-center flex-wrap gap-1.5 mt-1.5">
-          <CategoryBadges
-            isWork={todo.isWork}
-            isPersonal={todo.isPersonal}
-            isFuture={todo.isFuture}
-            isLearning={todo.isLearning}
-          />
+          <CategoryBadges categories={todo.categories} />
           {variant === 'pending' && revisionDate && (
             <span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-400">
               <Clock size={11} />
@@ -110,7 +106,10 @@ export function TodoItem({ todo, variant, onToggle, onUpdate, onDelete }: Props)
             </span>
           )}
           {variant === 'revision' && todo.revisionIteration !== undefined && (
-            <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 uppercase tracking-wide">
+            <span
+              title={`This is review #${todo.revisionIteration}. More reviews = stronger memory retention.`}
+              className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 uppercase tracking-wide cursor-help"
+            >
               Review #{todo.revisionIteration}
             </span>
           )}

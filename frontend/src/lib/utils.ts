@@ -5,14 +5,15 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatRevisionDate(date: string | number[] | undefined): string | null {
-  if (!date) return null
-  let d: Date
-  if (Array.isArray(date)) {
-    const [year, month, day] = date as number[]
-    d = new Date(year, month - 1, day)
-  } else {
-    d = new Date(date)
-  }
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+export function formatRevisionDate(dateStr?: string): string | null {
+  if (!dateStr) return null
+  const date = new Date(dateStr)
+  if (isNaN(date.getTime())) return null
+  const now = new Date()
+  const isThisYear = date.getFullYear() === now.getFullYear()
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    ...(isThisYear ? {} : { year: 'numeric' }),
+  })
 }

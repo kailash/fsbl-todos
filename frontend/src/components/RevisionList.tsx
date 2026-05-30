@@ -7,15 +7,20 @@ interface Props {
   loading: boolean
   error: string | null
   mutationError?: string | null
+  reload?: () => void
   onMarkReviewed: (todo: Todo) => Promise<void>
   onUpdate: (todo: Todo) => Promise<void>
   onDelete: (id: string) => Promise<void>
 }
 
-export function RevisionList({ todos, loading, error, mutationError, onMarkReviewed, onUpdate, onDelete }: Props) {
+export function RevisionList({ todos, loading, error, mutationError, reload, onMarkReviewed, onUpdate, onDelete }: Props) {
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'short', month: 'short', day: 'numeric',
   })
+
+  const title = !loading && todos.length > 0
+    ? `Review Today (${todos.length})`
+    : 'Review Today'
 
   return (
     <div className="bg-white rounded-[14px] border border-slate-200 shadow-sm overflow-hidden">
@@ -25,8 +30,9 @@ export function RevisionList({ todos, loading, error, mutationError, onMarkRevie
           <RefreshCw size={17} className="text-white" strokeWidth={2.5} />
         </div>
         <div>
-          <p className="text-[15px] font-bold text-slate-900 leading-tight">Review Today</p>
+          <p className="text-[15px] font-bold text-slate-900 leading-tight">{title}</p>
           <p className="text-xs text-slate-400 font-medium mt-0.5">{today}</p>
+          <p className="text-xs text-slate-400 mt-0.5">Items scheduled for spaced review today</p>
         </div>
       </div>
       <div className="mx-5 h-px bg-slate-50" />
@@ -37,7 +43,17 @@ export function RevisionList({ todos, loading, error, mutationError, onMarkRevie
           <p className="text-sm text-slate-400 py-10 text-center">Loading…</p>
         )}
         {!loading && error && (
-          <p className="text-sm text-red-500 py-10 text-center">{error}</p>
+          <div className="py-10 text-center">
+            <p className="text-sm text-red-500 mb-3">{error}</p>
+            {reload && (
+              <button
+                onClick={reload}
+                className="px-3 py-1.5 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg transition-colors"
+              >
+                Try again
+              </button>
+            )}
+          </div>
         )}
         {mutationError && (
           <p className="text-sm text-red-500 py-2 text-center">{mutationError}</p>
@@ -45,7 +61,7 @@ export function RevisionList({ todos, loading, error, mutationError, onMarkRevie
         {!loading && !error && todos.length === 0 && (
           <div className="text-center py-10 text-slate-400">
             <CheckCircle size={36} className="mx-auto mb-2 text-slate-200" />
-            <p className="text-sm font-medium">Nothing to review today!</p>
+            <p className="text-sm font-medium">You're all caught up for today. Keep reviewing to build long-term memory.</p>
           </div>
         )}
         {!loading && !error && todos.map(todo => (

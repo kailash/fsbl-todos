@@ -1,11 +1,13 @@
 package com.ka.fsp.todo.domain;
 
 import java.time.LocalDate;
+import java.util.EnumSet;
+import java.util.Set;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ka.fsp.todo.entity.Category;
 
 public class Todo {
 
@@ -13,14 +15,7 @@ public class Todo {
 	@NotBlank
 	@Size(max = 100)
 	private String title;
-	@JsonProperty("isWork")
-	private boolean isWork;
-	@JsonProperty("isPersonal")
-	private boolean isPersonal;
-	@JsonProperty("isFuture")
-	private boolean isFuture;
-	@JsonProperty("isLearning")
-	private boolean isLearning;
+	private Set<Category> categories = EnumSet.noneOf(Category.class);
 	private boolean completed = false;
 	private LocalDate createdAt = LocalDate.now();
 
@@ -48,7 +43,7 @@ public class Todo {
 		this.title = title;
 	}
 
-	public boolean getCompleted() {
+	public boolean isCompleted() {
 		return completed;
 	}
 
@@ -64,36 +59,12 @@ public class Todo {
 		this.createdAt = createdAt;
 	}
 
-	public boolean isWork() {
-		return isWork;
+	public Set<Category> getCategories() {
+		return categories;
 	}
 
-	public void setWork(boolean isWork) {
-		this.isWork = isWork;
-	}
-
-	public boolean isPersonal() {
-		return isPersonal;
-	}
-
-	public void setPersonal(boolean isPersonal) {
-		this.isPersonal = isPersonal;
-	}
-
-	public boolean isFuture() {
-		return isFuture;
-	}
-
-	public void setFuture(boolean isFuture) {
-		this.isFuture = isFuture;
-	}
-
-	public boolean isLearning() {
-		return isLearning;
-	}
-
-	public void setLearning(boolean isLearning) {
-		this.isLearning = isLearning;
+	public void setCategories(Set<Category> categories) {
+		this.categories = categories;
 	}
 
 	@Override

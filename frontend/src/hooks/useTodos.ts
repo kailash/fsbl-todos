@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { Todo, NewTodo } from '../types/todo'
 import { api } from '../lib/api'
 
@@ -7,25 +7,27 @@ export function useTodos() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [mutationError, setMutationError] = useState<string | null>(null)
+  const [refreshKey, setRefreshKey] = useState(0)
 
-  const load = useCallback(async (signal?: AbortSignal) => {
-    try {
-      setLoading(true)
-      setError(null)
-      setTodos(await api.getPendingTodos(signal))
-    } catch (err) {
-      if (err instanceof Error && err.name === 'AbortError') return
-      setError('Failed to load tasks')
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+  const reload = () => setRefreshKey(k => k + 1)
 
   useEffect(() => {
-    const controller = new AbortController()
-    load(controller.signal)
-    return () => controller.abort()
-  }, [load])
+    let cancelled = false
+    const load = async () => {
+      setLoading(true)
+      setError(null)
+      try {
+        const data = await api.getPendingTodos()
+        if (!cancelled) setTodos(data)
+      } catch (e) {
+        if (!cancelled) setError(e instanceof Error ? e.message : 'Failed to load')
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    load()
+    return () => { cancelled = true }
+  }, [refreshKey])
 
   const addTodo = async (data: NewTodo) => {
     try {
@@ -67,5 +69,5 @@ export function useTodos() {
     }
   }
 
-  return { todos, loading, error, mutationError, addTodo, updateTodo, markComplete, deleteTodo }
+  return { todos, loading, error, mutationError, reload, addTodo, updateTodo, markComplete, deleteTodo }
 }

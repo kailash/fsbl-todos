@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import jakarta.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,44 +16,43 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ka.fsp.todo.domain.Todo;
-import com.ka.fsp.todo.entity.TodoEntity;
+import com.ka.fsp.todo.dto.TodoResponse;
 import com.ka.fsp.todo.service.TodoService;
 
 @RestController
 @RequestMapping("/api")
 public class TodoController {
 
-	@Autowired
-	TodoService todoService;
+	private final TodoService todoService;
+
+	public TodoController(TodoService todoService) {
+		this.todoService = todoService;
+	}
 
 	@GetMapping("/todos")
-	public List<TodoEntity> getAllTodos() {
+	public List<TodoResponse> getAllTodos() {
 		return todoService.getAll();
 	}
 
 	@GetMapping("/todos/pending")
-	public List<TodoEntity> getAllPendingTodos() {
+	public List<TodoResponse> getAllPendingTodos() {
 		return todoService.getAllPending();
 	}
 
 	@PostMapping("/todos")
-	public ResponseEntity<TodoEntity> createTodo(@Valid @RequestBody Todo todo) {
+	public ResponseEntity<TodoResponse> createTodo(@Valid @RequestBody Todo todo) {
 		return ResponseEntity.ok().body(todoService.save(todo));
 	}
 
 	@GetMapping(value = "/todos/{id}")
-	public ResponseEntity<TodoEntity> getTodoById(@PathVariable("id") String id) {
-		try {
-			return ResponseEntity.ok().body(todoService.getTodoById(id));
-		} catch (java.util.NoSuchElementException e) {
-			return ResponseEntity.notFound().build();
-		}
+	public ResponseEntity<TodoResponse> getTodoById(@PathVariable("id") String id) {
+		return ResponseEntity.ok().body(todoService.getTodoById(id));
 	}
 
 	@PutMapping(value = "/todos/{id}")
-	public ResponseEntity<TodoEntity> updateTodo(@PathVariable("id") String id,
+	public ResponseEntity<TodoResponse> updateTodo(@PathVariable("id") String id,
 			@Valid @RequestBody Todo todo) {
-		Optional<TodoEntity> optional = todoService.updateTodo(id, todo);
+		Optional<TodoResponse> optional = todoService.updateTodo(id, todo);
 		if (optional.isPresent()) {
 			return ResponseEntity.ok().body(optional.get());
 		} else {
@@ -62,22 +60,14 @@ public class TodoController {
 		}
 	}
 
-	@PostMapping(value = "/todos/{id}/review")
-	public ResponseEntity<TodoEntity> reviewTodo(@PathVariable("id") String id) {
-		try {
-			return ResponseEntity.ok().body(todoService.markReviewed(id));
-		} catch (java.util.NoSuchElementException e) {
-			return ResponseEntity.notFound().build();
-		}
+	@PostMapping(value = "/todos/{id}/mark-reviewed")
+	public ResponseEntity<TodoResponse> reviewTodo(@PathVariable("id") String id) {
+		return ResponseEntity.ok().body(todoService.markReviewed(id));
 	}
 
 	@DeleteMapping(value = "/todos/{id}")
 	public ResponseEntity<?> deleteTodo(@PathVariable("id") String id) {
-		try {
-			todoService.deleteTodo(id);
-			return ResponseEntity.ok().build();
-		} catch (java.util.NoSuchElementException e) {
-			return ResponseEntity.notFound().build();
-		}
+		todoService.deleteTodo(id);
+		return ResponseEntity.ok().build();
 	}
 }

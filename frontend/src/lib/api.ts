@@ -6,7 +6,8 @@ async function request<T>(url: string, options?: RequestInit & { signal?: AbortS
   const { signal, ...rest } = options ?? {}
   const res = await fetch(url, { ...rest, signal })
   if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`)
-  if (res.status === 204) return undefined as T
+  // DELETE returns 204 No Content
+  if (res.status === 204) return undefined as unknown as T
   return res.json() as Promise<T>
 }
 
@@ -14,11 +15,11 @@ const JSON_HEADERS = { 'Content-Type': 'application/json' }
 
 function toISODate(d: unknown): string | undefined {
   if (!d) return undefined
-  if (Array.isArray(d)) {
+  if (Array.isArray(d) && d.length === 3 && d.every(x => typeof x === 'number')) {
     const [y, m, day] = d as number[]
     return `${y}-${String(m).padStart(2, '0')}-${String(day).padStart(2, '0')}`
   }
-  return d as string
+  return typeof d === 'string' ? d : undefined
 }
 
 function normalizeTodo(raw: unknown): Todo {
@@ -27,7 +28,7 @@ function normalizeTodo(raw: unknown): Todo {
     ...(r as unknown as Todo),
     nextRevisionDate: toISODate(r.nextRevisionDate),
     createdAt: toISODate(r.createdAt),
-    revisionIteration: (r.revisionIteration ?? r.revisionIeration) as number | undefined,
+    revisionIteration: r.revisionIteration as number | undefined,
   }
 }
 
@@ -53,7 +54,7 @@ export const api = {
     }).then(normalizeTodo),
 
   markReviewed: (id: string) =>
-    request<unknown>(`${BASE}/todos/${id}/review`, { method: 'POST' }).then(normalizeTodo),
+    request<unknown>(`${BASE}/todos/${id}/mark-reviewed`, { method: 'POST' }).then(normalizeTodo),
 
   deleteTodo: (id: string) =>
     request<void>(`${BASE}/todos/${id}`, { method: 'DELETE' }),

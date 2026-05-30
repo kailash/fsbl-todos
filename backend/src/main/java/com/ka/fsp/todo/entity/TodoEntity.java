@@ -1,32 +1,30 @@
 package com.ka.fsp.todo.entity;
 
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Document(collection = "todos")
+@CompoundIndexes({
+    @CompoundIndex(name = "revision_idx", def = "{'completed': 1, 'nextRevisionDate': 1}")
+})
 public class TodoEntity {
 
 	@Id
 	private String id;
-	@Indexed(unique = true)
 	private String title;
-	@JsonProperty("revisionIteration")
 	private int revisionIteration;
 	private LocalDate nextRevisionDate;
-	@JsonProperty("isWork")
-	private boolean isWork;
-	@JsonProperty("isPersonal")
-	private boolean isPersonal;
-	@JsonProperty("isFuture")
-	private boolean isFuture;
-	@JsonProperty("isLearning")
-	private boolean isLearning;
-	private Boolean completed = false;
+	private Set<Category> categories = EnumSet.noneOf(Category.class);
+	private boolean completed = false;
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	private LocalDate createdAt = LocalDate.now();
 
@@ -54,11 +52,11 @@ public class TodoEntity {
 		this.title = title;
 	}
 
-	public Boolean getCompleted() {
+	public boolean isCompleted() {
 		return completed;
 	}
 
-	public void setCompleted(Boolean completed) {
+	public void setCompleted(boolean completed) {
 		this.completed = completed;
 	}
 
@@ -86,42 +84,17 @@ public class TodoEntity {
 		this.nextRevisionDate = nextRevisionDate;
 	}
 
-	public boolean isWork() {
-		return isWork;
+	public Set<Category> getCategories() {
+		return Collections.unmodifiableSet(categories);
 	}
 
-	public void setWork(boolean isWork) {
-		this.isWork = isWork;
-	}
-
-	public boolean isPersonal() {
-		return isPersonal;
-	}
-
-	public void setPersonal(boolean isPersonal) {
-		this.isPersonal = isPersonal;
-	}
-
-	public boolean isFuture() {
-		return isFuture;
-	}
-
-	public void setFuture(boolean isFuture) {
-		this.isFuture = isFuture;
-	}
-
-	public boolean isLearning() {
-		return isLearning;
-	}
-
-	public void setLearning(boolean isLearning) {
-		this.isLearning = isLearning;
+	public void setCategories(Set<Category> categories) {
+		this.categories = categories == null ? EnumSet.noneOf(Category.class) : EnumSet.copyOf(categories.isEmpty() ? EnumSet.noneOf(Category.class) : categories);
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Todo[id=%s, title='%s', completed='%s']", id, title,
-				completed);
+		return String.format("Todo[id=%s, title='%s', completed='%s']", id, title, completed);
 	}
 
 }

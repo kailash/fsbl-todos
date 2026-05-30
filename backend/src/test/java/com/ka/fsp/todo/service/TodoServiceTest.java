@@ -1,5 +1,6 @@
 package com.ka.fsp.todo.service;
 
+import com.ka.fsp.todo.dto.TodoResponse;
 import com.ka.fsp.todo.entity.TodoEntity;
 import com.ka.fsp.todo.repository.TodoRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,30 +37,30 @@ class TodoServiceTest {
     }
 
     @Test
-    void markReviewed_setsNextRevisionDateToTodayPlusOne_andIterationBecomesOne() {
+    void markReviewed_setsNextRevisionDateToTodayPlusTwo_andIterationBecomesOne() {
         when(todoRepository.findById("test-id-1")).thenReturn(Optional.of(existingEntity));
         when(todoRepository.save(any(TodoEntity.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        TodoEntity result = todoService.markReviewed("test-id-1");
+        TodoResponse result = todoService.markReviewed("test-id-1");
 
         assertEquals(1, result.getRevisionIteration());
-        assertTrue(result.getCompleted());
-        // FIB_ARRAY[1 % 12] = FIB_ARRAY[1] = 2 days from now
+        assertTrue(result.isCompleted());
+        // FibonacciScheduler.getDaysUntilNextReview(1) = INTERVALS[1] = 2 days
         assertEquals(LocalDate.now().plusDays(2), result.getNextRevisionDate());
     }
 
     @Test
-    void markReviewed_after12Reviews_iterationWrapsAndNextRevisionDateIsCorrect() {
-        // Start at iteration 11 so after one more review iteration becomes 12
+    void markReviewed_afterMaxReviews_capsAtLongestInterval() {
+        // Start at iteration 11; after one more review iteration becomes 12
         existingEntity.setRevisionIteration(11);
         when(todoRepository.findById("test-id-1")).thenReturn(Optional.of(existingEntity));
         when(todoRepository.save(any(TodoEntity.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        TodoEntity result = todoService.markReviewed("test-id-1");
+        TodoResponse result = todoService.markReviewed("test-id-1");
 
-        // iteration becomes 12, FIB_ARRAY[12 % 12] = FIB_ARRAY[0] = 1
+        // iteration 12 → Math.min(12, 11) = index 11 → INTERVALS[11] = 233 days (not 1 day via modulo)
         assertEquals(12, result.getRevisionIteration());
-        assertEquals(LocalDate.now().plusDays(1), result.getNextRevisionDate());
-        assertTrue(result.getCompleted());
+        assertEquals(LocalDate.now().plusDays(233), result.getNextRevisionDate());
+        assertTrue(result.isCompleted());
     }
 }

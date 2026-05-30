@@ -6,3 +6,15 @@ spring:
     mongodb:
       database: ${MONGO_DATABASENAME:todoapp}
       uri: ${MONGO_URL:mongodb://localhost:27017/todoapp}
+
+cors:
+  allowed-origins: http://localhost:4200
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always

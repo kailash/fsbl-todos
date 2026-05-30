@@ -1,22 +1,25 @@
 package com.ka.fsp.todo;
 
+import com.ka.fsp.todo.entity.Category;
 import com.ka.fsp.todo.entity.TodoEntity;
 import com.ka.fsp.todo.repository.TodoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.ka.fsp.todo.util.FibonacciScheduler;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 
 @Component
 public class DataLoader implements CommandLineRunner {
 
-    private static final int[] FIB_ARRAY = { 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233 };
+    private final TodoRepository todoRepository;
 
-    @Autowired
-    private TodoRepository todoRepository;
+    public DataLoader(TodoRepository todoRepository) {
+        this.todoRepository = todoRepository;
+    }
 
     @Override
     public void run(String... args) {
@@ -24,62 +27,61 @@ public class DataLoader implements CommandLineRunner {
             return;
         }
 
-        LocalDate today = LocalDate.now();
 
         List<TodoEntity> todos = Arrays.asList(
             // ── Pending todos ──────────────────────────────────────────────
             todo("Study Spring Boot fundamentals",
                     false, 0,
-                    false, false, false, true),
+                    Category.LEARNING),
 
             todo("Read Clean Code by Robert Martin",
                     false, 2,
-                    false, false, false, true),
+                    Category.LEARNING),
 
             todo("Prepare Q3 project roadmap",
                     false, 0,
-                    true, false, false, false),
+                    Category.WORK),
 
             todo("Review AWS architecture decisions",
                     false, 1,
-                    true, false, false, true),
+                    Category.WORK, Category.LEARNING),
 
             todo("Plan weekend hiking trip",
                     false, 0,
-                    false, true, true, false),
+                    Category.PERSONAL, Category.FUTURE),
 
             todo("Call dentist for appointment",
                     false, 0,
-                    false, true, false, false),
+                    Category.PERSONAL),
 
             todo("Angular state management patterns",
                     false, 0,
-                    false, false, false, true),
+                    Category.LEARNING),
 
             todo("Refactor authentication module",
                     false, 1,
-                    true, false, false, false),
+                    Category.WORK),
 
             todo("Research standing desk options",
                     false, 0,
-                    false, true, true, false),
+                    Category.PERSONAL, Category.FUTURE),
 
             todo("Write integration tests for API",
                     false, 0,
-                    true, false, false, false),
+                    Category.WORK),
 
             // ── Completed todos due for review today (show in Review panel) ─
             todo("Docker networking deep dive",
                     true, 4,
-                    false, false, false, true),
+                    Category.LEARNING),
 
             todo("Design system component patterns",
                     true, 2,
-                    true, false, false, true),
+                    Category.WORK, Category.LEARNING),
 
             todo("MongoDB aggregation pipelines",
                     true, 1,
-                    false, false, false, true)
+                    Category.LEARNING)
         );
 
         todoRepository.saveAll(todos);
@@ -87,21 +89,19 @@ public class DataLoader implements CommandLineRunner {
 
     private TodoEntity todo(String title,
                              boolean completed, int iteration,
-                             boolean isWork, boolean isPersonal, boolean isFuture, boolean isLearning) {
+                             Category... categories) {
         TodoEntity e = new TodoEntity();
         e.setTitle(title);
         e.setCompleted(completed);
         e.setRevisionIteration(iteration);
         if (completed) {
-            // Completed todos are due for review today
             e.setNextRevisionDate(LocalDate.now());
         } else if (iteration > 0) {
-            e.setNextRevisionDate(LocalDate.now().plusDays(FIB_ARRAY[iteration % 12]));
+            e.setNextRevisionDate(LocalDate.now().plusDays(FibonacciScheduler.getDaysUntilNextReview(iteration)));
         }
-        e.setWork(isWork);
-        e.setPersonal(isPersonal);
-        e.setFuture(isFuture);
-        e.setLearning(isLearning);
+        e.setCategories(categories.length == 0
+                ? EnumSet.noneOf(Category.class)
+                : EnumSet.copyOf(Arrays.asList(categories)));
         return e;
     }
 }

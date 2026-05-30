@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { Todo } from '../types/todo'
 import { api } from '../lib/api'
 
@@ -7,25 +7,27 @@ export function useRevisionList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [mutationError, setMutationError] = useState<string | null>(null)
+  const [refreshKey, setRefreshKey] = useState(0)
 
-  const load = useCallback(async (signal?: AbortSignal) => {
-    try {
-      setLoading(true)
-      setError(null)
-      setTodos(await api.getRevisionList(signal))
-    } catch (err) {
-      if (err instanceof Error && err.name === 'AbortError') return
-      setError('Failed to load revision list')
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+  const reload = () => setRefreshKey(k => k + 1)
 
   useEffect(() => {
-    const controller = new AbortController()
-    load(controller.signal)
-    return () => controller.abort()
-  }, [load])
+    let cancelled = false
+    const load = async () => {
+      setLoading(true)
+      setError(null)
+      try {
+        const data = await api.getRevisionList()
+        if (!cancelled) setTodos(data)
+      } catch (e) {
+        if (!cancelled) setError(e instanceof Error ? e.message : 'Failed to load revision list')
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    load()
+    return () => { cancelled = true }
+  }, [refreshKey])
 
   const markReviewed = async (todo: Todo) => {
     try {
@@ -57,5 +59,5 @@ export function useRevisionList() {
     }
   }
 
-  return { todos, loading, error, mutationError, markReviewed, updateTodo, deleteTodo }
+  return { todos, loading, error, mutationError, reload, markReviewed, updateTodo, deleteTodo }
 }
