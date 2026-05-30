@@ -22,28 +22,36 @@ const EMPTY: NewTodo = {
 export function AddTodo({ onAdd }: Props) {
   const [form, setForm] = useState<NewTodo>({ ...EMPTY })
   const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const toggle = (key: Category) =>
     setForm(prev => ({ ...prev, [key]: !prev[key] }))
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const submit = async () => {
     if (!form.title.trim() || submitting) return
     try {
+      setSubmitError(null)
       setSubmitting(true)
       await onAdd({ ...form, title: form.title.trim() })
       setForm({ ...EMPTY })
       textareaRef.current?.focus()
+    } catch {
+      setSubmitError('Failed to add task. Please try again.')
     } finally {
       setSubmitting(false)
     }
   }
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    submit()
+  }
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      handleSubmit(e as unknown as React.FormEvent)
+      submit()
     }
   }
 
@@ -101,6 +109,9 @@ export function AddTodo({ onAdd }: Props) {
           </button>
         </div>
       </form>
+      {submitError && (
+        <p className="mt-2 text-sm text-red-500">{submitError}</p>
+      )}
     </div>
   )
 }

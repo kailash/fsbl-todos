@@ -2,27 +2,21 @@ package com.ka.fsp.todo.entity;
 
 import java.time.LocalDate;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Document(collection = "todos")
-@JsonIgnoreProperties(value = { "createdAt" }, allowGetters = true)
 public class TodoEntity {
 
 	@Id
 	private String id;
-	@NotBlank
-	@Size(max = 100)
 	@Indexed(unique = true)
 	private String title;
-	private int revisionIeration;
+	@JsonProperty("revisionIteration")
+	private int revisionIteration;
 	private LocalDate nextRevisionDate;
 	@JsonProperty("isWork")
 	private boolean isWork;
@@ -33,6 +27,7 @@ public class TodoEntity {
 	@JsonProperty("isLearning")
 	private boolean isLearning;
 	private Boolean completed = false;
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	private LocalDate createdAt = LocalDate.now();
 
 	public TodoEntity() {
@@ -75,20 +70,12 @@ public class TodoEntity {
 		this.createdAt = createdAt;
 	}
 
-	public int getRevisionIeration() {
-		return revisionIeration;
+	public int getRevisionIteration() {
+		return revisionIteration;
 	}
 
-	public void setRevisionIeration(int revisionIeration) {
-		this.revisionIeration = revisionIeration;
-	}
-
-	public LocalDate getNextRevision() {
-		return nextRevisionDate;
-	}
-
-	public void setNextRevision(LocalDate nextRevision) {
-		this.nextRevisionDate = nextRevision;
+	public void setRevisionIteration(int revisionIteration) {
+		this.revisionIteration = revisionIteration;
 	}
 
 	public LocalDate getNextRevisionDate() {

@@ -7,7 +7,6 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,18 +18,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ka.fsp.todo.domain.Todo;
 import com.ka.fsp.todo.entity.TodoEntity;
-import com.ka.fsp.todo.repository.TodoRepository;
 import com.ka.fsp.todo.service.TodoService;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin("*")
 public class TodoController {
-	@Autowired
-	TodoRepository todoRepository;
+
 	@Autowired
 	TodoService todoService;
-	
+
 	@GetMapping("/todos")
 	public List<TodoEntity> getAllTodos() {
 		return todoService.getAll();
@@ -48,37 +44,40 @@ public class TodoController {
 
 	@GetMapping(value = "/todos/{id}")
 	public ResponseEntity<TodoEntity> getTodoById(@PathVariable("id") String id) {
-		return todoRepository.findById(id).map(todo -> ResponseEntity.ok().body(todo))
-										  .orElse(ResponseEntity.notFound().build());
-	}
-
-	@PutMapping(value = "/todos/{id}")
-	public ResponseEntity<TodoEntity> updateTodo4Title(@PathVariable("id") String id,
-			@Valid @RequestBody Todo todo) {
-		Optional<TodoEntity> optional=todoService.updateTitle(id, todo);
-		if(optional.isPresent()) {
-			return ResponseEntity.ok().body(optional.get());
-		}else {
+		try {
+			return ResponseEntity.ok().body(todoService.getTodoById(id));
+		} catch (java.util.NoSuchElementException e) {
 			return ResponseEntity.notFound().build();
 		}
 	}
-	
-	@PutMapping(value = "/todos/updateitr/{id}")
-	public ResponseEntity<TodoEntity> updateTodo4RevisionDate(@PathVariable("id") String id,
+
+	@PutMapping(value = "/todos/{id}")
+	public ResponseEntity<TodoEntity> updateTodo(@PathVariable("id") String id,
 			@Valid @RequestBody Todo todo) {
-		Optional<TodoEntity> optional=todoService.updateTitleAndRevision(id, todo);
-		if(optional.isPresent()) {
+		Optional<TodoEntity> optional = todoService.updateTodo(id, todo);
+		if (optional.isPresent()) {
 			return ResponseEntity.ok().body(optional.get());
-		}else {
+		} else {
+			return ResponseEntity.notFound().build();
+		}
+	}
+
+	@PostMapping(value = "/todos/{id}/review")
+	public ResponseEntity<TodoEntity> reviewTodo(@PathVariable("id") String id) {
+		try {
+			return ResponseEntity.ok().body(todoService.markReviewed(id));
+		} catch (java.util.NoSuchElementException e) {
 			return ResponseEntity.notFound().build();
 		}
 	}
 
 	@DeleteMapping(value = "/todos/{id}")
 	public ResponseEntity<?> deleteTodo(@PathVariable("id") String id) {
-		return todoRepository.findById(id).map(todo -> {
-			todoRepository.deleteById(id);
+		try {
+			todoService.deleteTodo(id);
 			return ResponseEntity.ok().build();
-		}).orElse(ResponseEntity.notFound().build());
+		} catch (java.util.NoSuchElementException e) {
+			return ResponseEntity.notFound().build();
+		}
 	}
 }

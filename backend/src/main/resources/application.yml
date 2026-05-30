@@ -1,8 +1,8 @@
 server:
-  port:8080
+  port: 8080
 
 spring:
   data:
     mongodb:
-      database: ${MONGO_DATABASENAME}
-      uri: ${MONGO_URL}
+      database: ${MONGO_DATABASENAME:todoapp}
+      uri: ${MONGO_URL:mongodb://localhost:27017/todoapp}

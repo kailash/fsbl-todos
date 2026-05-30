@@ -6,12 +6,13 @@ interface Props {
   todos: Todo[]
   loading: boolean
   error: string | null
-  onToggle: (todo: Todo) => void
-  onUpdate: (todo: Todo) => void
-  onDelete: (id: string) => void
+  mutationError?: string | null
+  onToggle: (todo: Todo) => Promise<void>
+  onUpdate: (todo: Todo) => Promise<void>
+  onDelete: (id: string) => Promise<void>
 }
 
-export function TodoList({ todos, loading, error, onToggle, onUpdate, onDelete }: Props) {
+export function TodoList({ todos, loading, error, mutationError, onToggle, onUpdate, onDelete }: Props) {
   return (
     <div className="bg-white rounded-[14px] border border-slate-200 shadow-sm overflow-hidden">
       {/* Header */}
@@ -35,6 +36,9 @@ export function TodoList({ todos, loading, error, onToggle, onUpdate, onDelete }
         )}
         {!loading && error && (
           <p className="text-sm text-red-500 py-10 text-center">{error}</p>
+        )}
+        {mutationError && (
+          <p className="text-sm text-red-500 py-2 text-center">{mutationError}</p>
         )}
         {!loading && !error && todos.length === 0 && (
           <div className="text-center py-10 text-slate-400">

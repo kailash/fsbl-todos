@@ -6,11 +6,12 @@ import { useTodos } from './hooks/useTodos'
 import { useRevisionList } from './hooks/useRevisionList'
 
 export default function App() {
-  const { todos, loading, error, addTodo, updateTodo, markComplete, deleteTodo } = useTodos()
+  const { todos, loading, error, mutationError, addTodo, updateTodo, markComplete, deleteTodo } = useTodos()
   const {
     todos: revTodos,
     loading: revLoading,
     error: revError,
+    mutationError: revMutationError,
     markReviewed,
     updateTodo: updateRevTodo,
     deleteTodo: deleteRevTodo,
@@ -43,6 +44,7 @@ export default function App() {
               todos={todos}
               loading={loading}
               error={error}
+              mutationError={mutationError}
               onToggle={markComplete}
               onUpdate={updateTodo}
               onDelete={deleteTodo}
@@ -53,6 +55,7 @@ export default function App() {
               todos={revTodos}
               loading={revLoading}
               error={revError}
+              mutationError={revMutationError}
               onMarkReviewed={markReviewed}
               onUpdate={updateRevTodo}
               onDelete={deleteRevTodo}

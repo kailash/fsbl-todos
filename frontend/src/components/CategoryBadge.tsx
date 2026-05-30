@@ -16,7 +16,12 @@ function Badge({ category }: { category: Category }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <span className={`inline-flex items-center justify-center w-[22px] h-[22px] rounded-[6px] cursor-default ${cls}`}>
+        <span
+          role="img"
+          aria-label={label}
+          tabIndex={0}
+          className={`inline-flex items-center justify-center w-[22px] h-[22px] rounded-[6px] cursor-default ${cls}`}
+        >
           <Icon size={13} strokeWidth={2.5} />
         </span>
       </TooltipTrigger>

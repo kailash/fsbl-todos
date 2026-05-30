@@ -2,18 +2,20 @@ package com.ka.fsp.todo.domain;
 
 import java.time.LocalDate;
 
-import org.springframework.stereotype.Component;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Component
 public class Todo {
 
 	private String id;
+	@NotBlank
+	@Size(max = 100)
 	private String title;
 	@JsonProperty("isWork")
 	private boolean isWork;
-	@JsonProperty ("isPersonal")
+	@JsonProperty("isPersonal")
 	private boolean isPersonal;
 	@JsonProperty("isFuture")
 	private boolean isFuture;
