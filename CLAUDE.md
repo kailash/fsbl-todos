@@ -10,7 +10,7 @@ Fibonacci Series Based Learning (FSBL) Todo app — a spaced-repetition reminder
 
 Two independent sub-projects:
 
-**Backend** (`Todo/`) — Spring Boot 2.2.6 + Java 11 + MongoDB
+**Backend** (`backend/`) — Spring Boot 2.2.6 + Java 11 + MongoDB
 - `domain/Todo.java` — request/input DTO (no MongoDB annotations)
 - `entity/TodoEntity.java` — MongoDB document (`@Document(collection="todos")`); unique index on `title`
 - `service/TodoService.java` — core business logic; holds `fibArray` and implements the spaced-repetition scheduling
@@ -19,7 +19,7 @@ Two independent sub-projects:
 - `repository/TodoRepository.java` — Spring Data MongoDB repository
 - `DataLoader.java` — `CommandLineRunner` that seeds sample todos on first startup; skips if the collection is non-empty
 
-**Frontend** (`todo-frontend/`) — React 18 + Vite 5 + TypeScript + Tailwind CSS + shadcn/ui
+**Frontend** (`frontend/`) — React 18 + Vite 5 + TypeScript + Tailwind CSS + shadcn/ui
 - `src/lib/api.ts` — all HTTP calls (native fetch, async/await); replaces Angular's `TodoServiceService`
 - `src/types/todo.ts` — `Todo` and `NewTodo` TypeScript interfaces
 - `src/hooks/useTodos.ts` — state + CRUD for the pending task list
@@ -52,7 +52,7 @@ The frontend hardcodes `http://localhost:8080` as the backend URL, so the backen
 
 ## Commands
 
-### Backend (run from `Todo/`)
+### Backend (run from `backend/`)
 
 ```bash
 # Run (requires a MongoDB instance)
@@ -65,7 +65,7 @@ MONGO_DATABASENAME=todoapp MONGO_URL=mongodb://localhost:27017/todoapp ./mvnw sp
 ./mvnw test -Dtest=TodoApplicationTests
 ```
 
-### Frontend (run from `todo-frontend/`)
+### Frontend (run from `frontend/`)
 
 ```bash
 npm install
