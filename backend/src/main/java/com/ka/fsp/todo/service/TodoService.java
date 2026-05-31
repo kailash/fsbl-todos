@@ -59,14 +59,14 @@ public class TodoService {
 
   public TodoResponse save(Todo todo) {
     log.info("Creating todo: title={}", todo.getTitle());
-    TodoEntity todoEntity = new TodoEntity();
-    todoEntity.setTitle(todo.getTitle());
-    todoEntity.setRevisionIteration(0);
-    todoEntity.setCategories(todo.getCategories());
-    todoEntity.setCompleted(false);
-    todoEntity.setDescription(todo.getDescription());
-    todoEntity.setReminderDate(todo.getReminderDate());
-    return TodoResponse.from(todoRepository.save(todoEntity));
+    TodoEntity entity =
+        TodoEntity.builder()
+            .title(todo.getTitle())
+            .categories(todo.getCategories())
+            .description(todo.getDescription())
+            .reminderDate(todo.getReminderDate())
+            .build();
+    return TodoResponse.from(todoRepository.save(entity));
   }
 
   public TodoResponse getTodoById(String id) {
