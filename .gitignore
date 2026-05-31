@@ -21,6 +21,7 @@ testem.log
 # ── Claude Code internals ─────────────────────────────────────────
 .claude/worktrees/
 .claude/plans/
+.claude
 
 # ── Maven wrapper ─────────────────────────────────────────────────
 !.mvn/wrapper/maven-wrapper.jar
@@ -54,3 +55,8 @@ Thumbs.db
 # ── Misc ─────────────────────────────────────────────────────────
 coverage/
 out-tsc/
+.playwright-mcp
+
+# ── Debug / scratch screenshots (keep only docs/) ────────────────
+*.png
+!docs/*.png

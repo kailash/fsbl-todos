@@ -9,7 +9,7 @@ export function useRevisionList() {
   const [mutationError, setMutationError] = useState<string | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
 
-  const reload = () => setRefreshKey(k => k + 1)
+  const reload = () => setRefreshKey((k) => k + 1)
 
   useEffect(() => {
     let cancelled = false
@@ -26,14 +26,16 @@ export function useRevisionList() {
       }
     }
     load()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [refreshKey])
 
   const markReviewed = async (todo: Todo) => {
     try {
       setMutationError(null)
       await api.markReviewed(todo.id)
-      setTodos(prev => prev.filter(t => t.id !== todo.id))
+      setTodos((prev) => prev.filter((t) => t.id !== todo.id))
     } catch {
       setMutationError('Failed to mark as reviewed')
     }
@@ -43,7 +45,7 @@ export function useRevisionList() {
     try {
       setMutationError(null)
       const updated = await api.updateTodo(todo)
-      setTodos(prev => prev.map(t => t.id === updated.id ? updated : t))
+      setTodos((prev) => prev.map((t) => (t.id === updated.id ? updated : t)))
     } catch {
       setMutationError('Failed to update task')
     }
@@ -53,11 +55,42 @@ export function useRevisionList() {
     try {
       setMutationError(null)
       await api.deleteTodo(id)
-      setTodos(prev => prev.filter(t => t.id !== id))
+      setTodos((prev) => prev.filter((t) => t.id !== id))
     } catch {
       setMutationError('Failed to delete task')
     }
   }
 
-  return { todos, loading, error, mutationError, reload, markReviewed, updateTodo, deleteTodo }
+  const closeRevisionTodo = async (id: string) => {
+    try {
+      setMutationError(null)
+      await api.closeTodo(id)
+      setTodos((prev) => prev.filter((t) => t.id !== id))
+    } catch {
+      setMutationError('Failed to close task')
+    }
+  }
+
+  const snoozeRevisionTodo = async (id: string, date: string) => {
+    try {
+      setMutationError(null)
+      await api.setReminder(id, date)
+      setTodos((prev) => prev.filter((t) => t.id !== id))
+    } catch {
+      setMutationError('Failed to snooze task')
+    }
+  }
+
+  return {
+    todos,
+    loading,
+    error,
+    mutationError,
+    reload,
+    markReviewed,
+    updateTodo,
+    deleteTodo,
+    closeRevisionTodo,
+    snoozeRevisionTodo,
+  }
 }

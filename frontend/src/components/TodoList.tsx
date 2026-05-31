@@ -11,9 +11,22 @@ interface Props {
   onToggle: (todo: Todo) => Promise<void>
   onUpdate: (todo: Todo) => Promise<void>
   onDelete: (id: string) => Promise<void>
+  onClose: (id: string) => void
+  onRemind: (id: string, date: string) => void
 }
 
-export function TodoList({ todos, loading, error, mutationError, reload, onToggle, onUpdate, onDelete }: Props) {
+export function TodoList({
+  todos,
+  loading,
+  error,
+  mutationError,
+  reload,
+  onToggle,
+  onUpdate,
+  onDelete,
+  onClose,
+  onRemind,
+}: Props) {
   return (
     <div className="bg-white rounded-[14px] border border-slate-200 shadow-sm overflow-hidden">
       {/* Header */}
@@ -32,9 +45,7 @@ export function TodoList({ todos, loading, error, mutationError, reload, onToggl
 
       {/* Body */}
       <div className="px-5 pt-2 pb-4">
-        {loading && (
-          <p className="text-sm text-slate-400 py-10 text-center">Loading…</p>
-        )}
+        {loading && <p className="text-sm text-slate-400 py-10 text-center">Loading…</p>}
         {!loading && error && (
           <div className="py-10 text-center">
             <p className="text-sm text-red-500 mb-3">{error}</p>
@@ -48,25 +59,29 @@ export function TodoList({ todos, loading, error, mutationError, reload, onToggl
             )}
           </div>
         )}
-        {mutationError && (
-          <p className="text-sm text-red-500 py-2 text-center">{mutationError}</p>
-        )}
+        {mutationError && <p className="text-sm text-red-500 py-2 text-center">{mutationError}</p>}
         {!loading && !error && todos.length === 0 && (
           <div className="text-center py-10 text-slate-400">
             <Inbox size={36} className="mx-auto mb-2 text-slate-200" />
-            <p className="text-sm font-medium">No pending tasks. Add something new to learn or track.</p>
+            <p className="text-sm font-medium">
+              No pending tasks. Add something new to learn or track.
+            </p>
           </div>
         )}
-        {!loading && !error && todos.map(todo => (
-          <TodoItem
-            key={todo.id}
-            todo={todo}
-            variant="pending"
-            onToggle={onToggle}
-            onUpdate={onUpdate}
-            onDelete={onDelete}
-          />
-        ))}
+        {!loading &&
+          !error &&
+          todos.map((todo) => (
+            <TodoItem
+              key={todo.id}
+              todo={todo}
+              variant="pending"
+              onToggle={onToggle}
+              onUpdate={onUpdate}
+              onDelete={onDelete}
+              onClose={onClose}
+              onRemind={onRemind}
+            />
+          ))}
       </div>
     </div>
   )

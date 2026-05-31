@@ -1,158 +1,193 @@
 import { useState } from 'react'
-import { Zap } from 'lucide-react'
-import { AddTodo } from './components/AddTodo'
-import { TodoList } from './components/TodoList'
-import { RevisionList } from './components/RevisionList'
+import { Menu } from 'lucide-react'
+import { Sidebar } from './components/Sidebar'
+import { MobileDrawer } from './components/MobileDrawer'
+import { StatsCard } from './components/StatsCard'
+import { FilterBar } from './components/FilterBar'
+import { LearningSchedulePanel } from './components/LearningSchedulePanel'
+import { NewLearningPanel } from './components/NewLearningPanel'
+import { TasksPanel } from './components/TasksPanel'
+import { ArchiveModal } from './components/ArchiveModal'
 import { ToastContainer, type ToastMessage, type ToastType } from './components/Toast'
-import { useTodos } from './hooks/useTodos'
-import { useRevisionList } from './hooks/useRevisionList'
-import type { Todo, Category, NewTodo } from './types/todo'
+import { ErrorBoundary } from './components/ErrorBoundary'
+import { useAllTodos } from './hooks/useAllTodos'
+import { useStats } from './hooks/useStats'
+import { useDarkMode } from './hooks/useDarkMode'
+import { useNotifications } from './hooks/useNotifications'
+import type { Todo, NewTodo, Category } from './types/todo'
 
 let toastId = 0
 
-const FILTER_LABELS: { key: Category; label: string; cls: string; activeCls: string }[] = [
-  { key: 'PERSONAL', label: 'Personal', cls: 'border-emerald-400 text-emerald-700', activeCls: 'bg-emerald-500 text-white border-emerald-500' },
-  { key: 'WORK',     label: 'Work',     cls: 'border-red-400 text-red-700',         activeCls: 'bg-red-500 text-white border-red-500' },
-  { key: 'FUTURE',   label: 'Future',   cls: 'border-blue-400 text-blue-700',       activeCls: 'bg-blue-500 text-white border-blue-500' },
-  { key: 'LEARNING', label: 'Learning', cls: 'border-violet-400 text-violet-700',   activeCls: 'bg-violet-500 text-white border-violet-500' },
-]
-
 export default function App() {
-  const { todos, loading, error, mutationError, reload, addTodo, updateTodo, markComplete, deleteTodo } = useTodos()
   const {
-    todos: revTodos,
-    loading: revLoading,
-    error: revError,
-    mutationError: revMutationError,
-    reload: revReload,
+    learningSchedule,
+    newLearning,
+    tasks,
+    loading,
+    reload,
+    addTodo,
+    updateTodo,
+    deleteTodo,
     markReviewed,
-    updateTodo: updateRevTodo,
-    deleteTodo: deleteRevTodo,
-  } = useRevisionList()
+    markMastered,
+    closeTodo,
+    setReminder,
+  } = useAllTodos()
+
+  const [refreshKey, setRefreshKey] = useState(0)
+  const stats = useStats(refreshKey)
+  const { isDark, toggleDark } = useDarkMode()
+  useNotifications(learningSchedule)
 
   const [toasts, setToasts] = useState<ToastMessage[]>([])
-  const [activeFilter, setActiveFilter] = useState<Category | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState<Category | 'ALL'>('ALL')
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [archiveOpen, setArchiveOpen] = useState(false)
 
   const addToast = (message: string, type: ToastType = 'success') => {
     const id = ++toastId
-    setToasts(prev => [...prev, { id, message, type }])
+    setToasts((prev) => [...prev, { id, message, type }])
   }
 
-  const dismissToast = (id: number) => setToasts(prev => prev.filter(t => t.id !== id))
+  const dismissToast = (id: number) => setToasts((prev) => prev.filter((t) => t.id !== id))
+  const triggerRefresh = () => {
+    reload()
+    setRefreshKey((k) => k + 1)
+  }
 
-  const filterTodos = (list: Todo[]) =>
-    activeFilter ? list.filter(t => t.categories.includes(activeFilter)) : list
+  const q = searchQuery.toLowerCase().trim()
+  const filter = (list: Todo[]) => {
+    let result = list
+    if (q)
+      result = result.filter(
+        (t) => t.title.toLowerCase().includes(q) || (t.description ?? '').toLowerCase().includes(q)
+      )
+    if (categoryFilter !== 'ALL')
+      result = result.filter((t) => t.categories.includes(categoryFilter as Category))
+    return result
+  }
 
   const handleAddTodo = async (data: NewTodo) => {
     await addTodo(data)
+    triggerRefresh()
     addToast('Task added')
   }
-
-  const handleMarkComplete = async (todo: Todo) => {
-    await markComplete(todo)
-    addToast('Task completed')
-  }
-
   const handleUpdateTodo = async (todo: Todo) => {
     await updateTodo(todo)
     addToast('Task updated')
   }
-
   const handleDeleteTodo = async (id: string) => {
     await deleteTodo(id)
+    triggerRefresh()
     addToast('Task deleted')
   }
-
-  const handleMarkReviewed = async (todo: Todo) => {
-    await markReviewed(todo)
-    addToast('Marked as reviewed')
+  const handleMarkReviewed = async (id: string) => {
+    await markReviewed(id)
+    triggerRefresh()
+    addToast('Marked as reviewed — next review scheduled')
+  }
+  const handleMarkMastered = async (id: string) => {
+    await markMastered(id)
+    triggerRefresh()
+    addToast('Marked as mastered!')
+  }
+  const handleCloseTodo = async (id: string) => {
+    await closeTodo(id)
+    triggerRefresh()
+    addToast('Task closed')
+  }
+  const handleSetReminder = async (id: string, date: string) => {
+    await setReminder(id, date)
+    addToast('Reminder set')
   }
 
-  const handleUpdateRevTodo = async (todo: Todo) => {
-    await updateRevTodo(todo)
-    addToast('Task updated')
-  }
-
-  const handleDeleteRevTodo = async (id: string) => {
-    await deleteRevTodo(id)
-    addToast('Task deleted')
-  }
+  const sidebarContent = (
+    <Sidebar
+      isDark={isDark}
+      onToggleDark={toggleDark}
+      onAdd={handleAddTodo}
+      onArchive={() => setArchiveOpen(true)}
+      searchQuery={searchQuery}
+      onSearchChange={setSearchQuery}
+      stats={stats}
+    />
+  )
 
   return (
-    <div className="min-h-screen bg-slate-100 font-sans">
-      {/* Header */}
-      <header className="bg-zinc-900 sticky top-0 z-50 border-b border-white/5">
-        <div className="max-w-5xl mx-auto px-6 h-[60px] flex items-center">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
-              <Zap size={19} className="text-white" strokeWidth={2.5} />
-            </div>
-            <div className="flex flex-col gap-0">
-              <span className="text-white text-base font-bold tracking-wide leading-tight">FSBL</span>
-              <span className="text-zinc-500 text-[11px] font-normal leading-tight">Fibonacci Spaced Learning</span>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="bg-[#edf0f7] dark:bg-[#0b0b10] min-h-screen">
+      {/* Mobile top bar */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-30 h-12 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-4 gap-3">
+        <button
+          onClick={() => setMobileOpen(true)}
+          aria-label="Open menu"
+          className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+        >
+          <Menu size={18} />
+        </button>
+        <span className="text-sm font-bold text-slate-800 dark:text-white tracking-wide">FSBL</span>
+      </div>
 
-      {/* Main */}
-      <main className="max-w-5xl mx-auto px-6 py-7 flex flex-col gap-5">
-        <AddTodo onAdd={handleAddTodo} />
+      <MobileDrawer open={mobileOpen} onClose={() => setMobileOpen(false)}>
+        {sidebarContent}
+      </MobileDrawer>
 
-        {/* Category filter chips */}
-        <div className="flex gap-2 flex-wrap">
-          <button
-            onClick={() => setActiveFilter(null)}
-            className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all duration-150 ${
-              activeFilter === null
-                ? 'bg-slate-700 text-white border-slate-700'
-                : 'bg-white text-slate-500 border-slate-300 hover:border-slate-400'
-            }`}
-          >
-            All
-          </button>
-          {FILTER_LABELS.map(({ key, label, cls, activeCls }) => (
-            <button
-              key={key}
-              onClick={() => setActiveFilter(prev => prev === key ? null : key)}
-              className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all duration-150 ${
-                activeFilter === key ? activeCls : `bg-white ${cls} hover:opacity-80`
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+      {/* Page container: sidebar on left, main on right */}
+      <div className="max-w-5xl mx-auto md:shadow-sm flex items-start">
+        {/*
+          Sidebar: sticky so it stays in view while the main column scrolls.
+          h-screen keeps it viewport-height. py-5 on the logo strip (inside Sidebar)
+          matches the main column's pt-5, so the logo and stats cards start at
+          exactly the same y-coordinate.
+        */}
+        <aside
+          className="hidden md:flex flex-col w-72 lg:w-80 flex-shrink-0
+                          bg-white dark:bg-slate-900
+                          border-r border-slate-200 dark:border-slate-800
+                          sticky top-5 h-[calc(100vh-1.25rem)] overflow-y-auto self-start mt-5"
+        >
+          {sidebarContent}
+        </aside>
 
-        <div className="flex gap-5 items-start flex-col md:flex-row">
-          <div className="flex-1 min-w-0 w-full order-last md:order-first">
-            <TodoList
-              todos={filterTodos(todos)}
+        {/* Main: normal page flow — scrolls behind the sticky sidebar */}
+        <main
+          className="flex-1 min-w-0 px-4 md:px-6 pt-16 md:pt-5 pb-8
+                         flex flex-col gap-4
+                         bg-[#edf0f7] dark:bg-[#0b0b10]"
+        >
+          <StatsCard stats={stats} />
+          <FilterBar active={categoryFilter} onChange={setCategoryFilter} />
+          <ErrorBoundary>
+            <LearningSchedulePanel
+              todos={filter(learningSchedule)}
               loading={loading}
-              error={error}
-              mutationError={mutationError}
-              reload={reload}
-              onToggle={handleMarkComplete}
+              onMarkReviewed={handleMarkReviewed}
+              onMaster={handleMarkMastered}
               onUpdate={handleUpdateTodo}
               onDelete={handleDeleteTodo}
             />
-          </div>
-          <div className="flex-1 min-w-0 w-full order-first md:order-last">
-            <RevisionList
-              todos={filterTodos(revTodos)}
-              loading={revLoading}
-              error={revError}
-              mutationError={revMutationError}
-              reload={revReload}
-              onMarkReviewed={handleMarkReviewed}
-              onUpdate={handleUpdateRevTodo}
-              onDelete={handleDeleteRevTodo}
+            <NewLearningPanel
+              todos={filter(newLearning)}
+              loading={loading}
+              onStartReview={handleMarkReviewed}
+              onUpdate={handleUpdateTodo}
+              onDelete={handleDeleteTodo}
             />
-          </div>
-        </div>
-      </main>
+            <TasksPanel
+              todos={filter(tasks)}
+              loading={loading}
+              onClose={handleCloseTodo}
+              onRemind={handleSetReminder}
+              onUpdate={handleUpdateTodo}
+              onDelete={handleDeleteTodo}
+            />
+          </ErrorBoundary>
+          <div className="h-4" />
+        </main>
+      </div>
 
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
+      {archiveOpen && <ArchiveModal onClose={() => setArchiveOpen(false)} />}
     </div>
   )
 }

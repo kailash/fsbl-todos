@@ -1,75 +1,95 @@
 package com.ka.fsp.todo.domain;
 
+import com.ka.fsp.todo.entity.Category;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.EnumSet;
 import java.util.Set;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-
-import com.ka.fsp.todo.entity.Category;
-
 public class Todo {
 
-	private String id;
-	@NotBlank
-	@Size(max = 100)
-	private String title;
-	private Set<Category> categories = EnumSet.noneOf(Category.class);
-	private boolean completed = false;
-	private LocalDate createdAt = LocalDate.now();
+  private String id;
 
-	public Todo() {
-		super();
-	}
+  @NotBlank
+  @Size(max = 100)
+  private String title;
 
-	public Todo(String title) {
-		this.title = title;
-	}
+  private Set<Category> categories = EnumSet.noneOf(Category.class);
+  private boolean completed = false;
+  private LocalDate createdAt = LocalDate.now();
 
-	public String getId() {
-		return id;
-	}
+  @Size(max = 1000)
+  private String description;
 
-	public void setId(String id) {
-		this.id = id;
-	}
+  private LocalDate reminderDate;
 
-	public String getTitle() {
-		return title;
-	}
+  public Todo() {
+    super();
+  }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+  public Todo(String title) {
+    this.title = title;
+  }
 
-	public boolean isCompleted() {
-		return completed;
-	}
+  public String getId() {
+    return id;
+  }
 
-	public void setCompleted(boolean completed) {
-		this.completed = completed;
-	}
+  public void setId(String id) {
+    this.id = id;
+  }
 
-	public LocalDate getCreatedAt() {
-		return createdAt;
-	}
+  public String getTitle() {
+    return title;
+  }
 
-	public void setCreatedAt(LocalDate createdAt) {
-		this.createdAt = createdAt;
-	}
+  public void setTitle(String title) {
+    this.title = title;
+  }
 
-	public Set<Category> getCategories() {
-		return categories;
-	}
+  public boolean isCompleted() {
+    return completed;
+  }
 
-	public void setCategories(Set<Category> categories) {
-		this.categories = categories;
-	}
+  public void setCompleted(boolean completed) {
+    this.completed = completed;
+  }
 
-	@Override
-	public String toString() {
-		return String.format("Todo[id=%s, title='%s', completed='%s']", id, title,
-				completed);
-	}
+  public LocalDate getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(LocalDate createdAt) {
+    this.createdAt = createdAt;
+  }
+
+  public Set<Category> getCategories() {
+    return categories;
+  }
+
+  public void setCategories(Set<Category> categories) {
+    this.categories = categories;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public LocalDate getReminderDate() {
+    return reminderDate;
+  }
+
+  public void setReminderDate(LocalDate reminderDate) {
+    this.reminderDate = reminderDate;
+  }
+
+  @Override
+  public String toString() {
+    return String.format("Todo[id=%s, title='%s', completed='%s']", id, title, completed);
+  }
 }

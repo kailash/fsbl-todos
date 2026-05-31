@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "format": "prettier --write src"
   },
   "dependencies": {
     "@radix-ui/react-tooltip": "^1.1.2",
@@ -15,17 +17,23 @@
     "lucide-react": "^0.441.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-router-dom": "^7.16.0",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^5.0.0",
     "autoprefixer": "^10.4.20",
+    "eslint": "^10.4.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "postcss": "^8.4.45",
+    "prettier": "^3.8.3",
     "tailwindcss": "^3.4.10",
     "typescript": "^5.5.3",
+    "typescript-eslint": "^8.60.0",
     "vite": "^6.3.5"
   }
 }

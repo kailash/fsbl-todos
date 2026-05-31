@@ -9,7 +9,7 @@ export function useTodos() {
   const [mutationError, setMutationError] = useState<string | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
 
-  const reload = () => setRefreshKey(k => k + 1)
+  const reload = () => setRefreshKey((k) => k + 1)
 
   useEffect(() => {
     let cancelled = false
@@ -26,14 +26,16 @@ export function useTodos() {
       }
     }
     load()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [refreshKey])
 
   const addTodo = async (data: NewTodo) => {
     try {
       setMutationError(null)
       const created = await api.createTodo(data)
-      setTodos(prev => [created, ...prev])
+      setTodos((prev) => [created, ...prev])
     } catch {
       setMutationError('Failed to add task')
     }
@@ -43,7 +45,7 @@ export function useTodos() {
     try {
       setMutationError(null)
       const updated = await api.updateTodo(todo)
-      setTodos(prev => prev.map(t => t.id === updated.id ? updated : t))
+      setTodos((prev) => prev.map((t) => (t.id === updated.id ? updated : t)))
     } catch {
       setMutationError('Failed to update task')
     }
@@ -53,7 +55,7 @@ export function useTodos() {
     try {
       setMutationError(null)
       await api.markReviewed(todo.id)
-      setTodos(prev => prev.filter(t => t.id !== todo.id))
+      setTodos((prev) => prev.filter((t) => t.id !== todo.id))
     } catch {
       setMutationError('Failed to mark task complete')
     }
@@ -63,11 +65,43 @@ export function useTodos() {
     try {
       setMutationError(null)
       await api.deleteTodo(id)
-      setTodos(prev => prev.filter(t => t.id !== id))
+      setTodos((prev) => prev.filter((t) => t.id !== id))
     } catch {
       setMutationError('Failed to delete task')
     }
   }
 
-  return { todos, loading, error, mutationError, reload, addTodo, updateTodo, markComplete, deleteTodo }
+  const closeTodo = async (id: string) => {
+    try {
+      setMutationError(null)
+      await api.closeTodo(id)
+      setTodos((prev) => prev.filter((t) => t.id !== id))
+    } catch {
+      setMutationError('Failed to close task')
+    }
+  }
+
+  const setReminder = async (id: string, date: string) => {
+    try {
+      setMutationError(null)
+      await api.setReminder(id, date)
+      setTodos((prev) => prev.filter((t) => t.id !== id))
+    } catch {
+      setMutationError('Failed to set reminder')
+    }
+  }
+
+  return {
+    todos,
+    loading,
+    error,
+    mutationError,
+    reload,
+    addTodo,
+    updateTodo,
+    markComplete,
+    deleteTodo,
+    closeTodo,
+    setReminder,
+  }
 }

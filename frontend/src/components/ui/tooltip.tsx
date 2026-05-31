@@ -23,12 +23,22 @@ export function TooltipContent({
         className={cn(
           'z-50 rounded-md bg-slate-900 px-2.5 py-1 text-xs font-medium text-white shadow-md',
           'animate-in fade-in-0 zoom-in-95',
-          className,
+          className
         )}
       >
         {children}
         <RadixTooltip.Arrow className="fill-slate-900" />
       </RadixTooltip.Content>
     </RadixTooltip.Portal>
+  )
+}
+
+/** Convenience wrapper: <Tip label="hint">…trigger…</Tip> */
+export function Tip({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{children as React.ReactElement}</TooltipTrigger>
+      <TooltipContent>{label}</TooltipContent>
+    </Tooltip>
   )
 }
