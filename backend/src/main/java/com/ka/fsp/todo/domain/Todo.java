@@ -1,5 +1,6 @@
 package com.ka.fsp.todo.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.ka.fsp.todo.entity.Category;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -11,9 +12,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+// Explicit @JsonCreator on the no-args constructor forces Jackson to bind via
+// setters instead of the Lombok-generated all-args constructor. Without this,
+// Jackson 3's constructor-detection selects the all-args constructor as the
+// creator and fails with "Cannot map `null` into type `boolean`" whenever a
+// request omits a primitive field (e.g. `completed`).
 @Data
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(onConstructor_ = @JsonCreator)
 @AllArgsConstructor
 public class Todo {
 

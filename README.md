@@ -56,7 +56,7 @@ The interval index advances with each review (cycling via modulo 12). Review les
 
 Two independent sub-projects inside a Docker Compose setup.
 
-### Backend (`backend/`) — Spring Boot 2.2.6 · Java 11 · MongoDB
+### Backend (`backend/`) — Spring Boot 4.1.1 · Java 25 · MongoDB
 
 | File | Purpose |
 |---|---|
@@ -177,7 +177,7 @@ Set automatically by `docker-compose.yml`. Only required when running outside Do
 
 | Layer | Technology |
 |---|---|
-| Backend | Spring Boot 2.2.6, Java 11 |
+| Backend | Spring Boot 4.1.1, Java 25 |
 | Database | MongoDB |
 | Frontend build | Vite 5 |
 | UI framework | React 18 |
