@@ -21,7 +21,6 @@ testem.log
 # ── Claude Code internals ─────────────────────────────────────────
 .claude/worktrees/
 .claude/plans/
-.claude
 
 # ── Maven wrapper ─────────────────────────────────────────────────
 !.mvn/wrapper/maven-wrapper.jar
